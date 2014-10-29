@@ -1052,7 +1052,6 @@ var LZUTF8;
             this.outputPosition = 0;
             this.outputString = "";
         }
-        //private static charCodeArrayToString: (charCodes) => string = Function.prototype.apply.bind(String.fromCharCode, null);
         StringBuilder.prototype.append = function (charCode) {
             this.outputBuffer[this.outputPosition++] = charCode;
 
@@ -1071,12 +1070,12 @@ var LZUTF8;
         };
 
         StringBuilder.prototype.toString = function () {
-            this.outputBuffer.length = this.outputPosition;
-            return this.outputString + StringBuilder.charCodeArrayToString(this.outputBuffer);
+            this.flushBufferToOutputString();
+            return this.outputString;
         };
 
         StringBuilder.prototype.flushBufferToOutputString = function () {
-            this.outputString += StringBuilder.charCodeArrayToString(this.outputBuffer);
+            this.outputString += StringBuilder.charCodeArrayToString(this.outputBuffer.slice(0, this.outputPosition));
             this.outputPosition = 0;
         };
 
@@ -1525,15 +1524,9 @@ var LZUTF8;
 (function (LZUTF8) {
     var EncodingBenchmarks = (function () {
         function EncodingBenchmarks() {
-            var size = 1000000;
-            this.randomBytes = LZUTF8.newByteArray(size);
-            for (var i = 0; i < size; i++)
-                this.randomBytes[i] = Math.floor(Math.random() * size);
+            this.randomUTF16String = EncodingBenchmarks.getRandomUTF16StringOfLength(500000);
+            this.randomBytes = LZUTF8.encodeUTF8(this.randomUTF16String);
         }
-        EncodingBenchmarks.prototype.beforeEach = function () {
-            this.randomUTF16String = EncodingBenchmarks.getRandomUTF16StringOfLength(300000);
-        };
-
         EncodingBenchmarks.prototype.encodeBase64 = function () {
             this.base64String = LZUTF8.Encoding.Base64.encode(this.randomBytes);
         };
