@@ -71,10 +71,10 @@ var LZUTF8;
                 if (!withinAMatchedRange)
                     this.outputRawByte(inputValue);
                 // Add the current 4 byte sequence to the hash table 
-                // (note that input buffer offset starts at 1, so it will never equal 0, thus the hash
-                // table can safely use 0 as an empty slot indicator - this property is used by the custom hash table implementation).
-                var streamPosition = this.inputBufferStreamOffset + readPosition;
-                this.prefixHashTable.addValueToBucket(targetBucketIndex, streamPosition);
+                // (note that input stream offset starts at 1, so it will never equal 0, thus the hash
+                // table can safely use 0 as an empty bucket slot indicator - this property is critical for the custom hash table implementation).
+                var inputStreamPosition = this.inputBufferStreamOffset + readPosition;
+                this.prefixHashTable.addValueToBucket(targetBucketIndex, inputStreamPosition);
             }
             //this.logStatisticsToConsole(readPosition - bufferStartingReadOffset);
             return this.outputBuffer.subarray(0, this.outputBufferPosition);
@@ -1189,9 +1189,11 @@ var LZUTF8;
             for (var readPosition = 0, inputLength = input.length; readPosition < inputLength; readPosition++) {
                 var inputValue = input[readPosition];
                 if (inputValue >>> 6 != 3) {
+                    // If at the continuation byte of a UTF-8 codepoint sequence, output the literal value and continue
                     this.outputByte(inputValue);
                     continue;
                 }
+                // At this point it is know that the current byte is the lead byte of either a UTF-8 codepoint or a sized pointer sequence.
                 var sequenceLengthIdentifier = inputValue >>> 5; // 6 for 2 bytes, 7 for at least 3 bytes
                 // If bytes in read position imply the start of a truncated input sequence (either a literal codepoint or a pointer)
                 // keep the remainder to be decoded with the next buffer
@@ -1199,8 +1201,9 @@ var LZUTF8;
                     this.inputBufferRemainder = LZUTF8.newByteArray(input.subarray(readPosition));
                     break;
                 }
+                // If at the leading byte of a UTF-8 codepoint byte sequence
                 if (input[readPosition + 1] >>> 7 === 1) {
-                    // Beginning of a codepoint byte sequence
+                    // Output the literal value
                     this.outputByte(inputValue);
                 }
                 else {
@@ -1998,15 +2001,15 @@ var LZUTF8;
             addTestsForInputString("Lorem ipsum", LZUTF8.TestData.loremIpsum);
             addTestsForInputString("Chinese text", LZUTF8.TestData.chineseText);
             addTestsForInputString("Hindi text", LZUTF8.TestData.hindiText);
-            addTestsForInputString("Random unicode characters (up to codepoint 1112064)", LZUTF8.Random.getRandomUTF16StringOfLength(10000));
+            addTestsForInputString("Random unicode characters (up to codepoint 1112064)", LZUTF8.Random.getRandomUTF16StringOfLength(2000));
             addTestsForInputString("Long mixed text", LZUTF8.TestData.hindiText + LZUTF8.TestData.loremIpsum + LZUTF8.TestData.hindiText + LZUTF8.TestData.chineseText + LZUTF8.TestData.chineseText);
-            addTestsForInputString("Repeating String 'aaaaaaa'..", LZUTF8.repeatString("aaaaaaaaaa", 10000));
+            addTestsForInputString("Repeating String 'aaaaaaa'..", LZUTF8.repeatString("aaaaaaaaaa", 2000));
         });
         describe("Sycnhronous operations with different input and output encodings", function () {
             var sourceAsString = LZUTF8.TestData.hindiText.substr(0, 100);
             var sourceAsByteArray = LZUTF8.encodeUTF8(sourceAsString);
             function addTestForEncodingCombination(testedSourceEncoding, testedCompressedEncoding, testedDecompressedEncoding) {
-                it("Successfuly compresses compresses a " + testedSourceEncoding + " to a " + testedCompressedEncoding + " and decompresses to a " + testedDecompressedEncoding, function () {
+                it("Successfuly compresses a " + testedSourceEncoding + " to a " + testedCompressedEncoding + " and decompresses to a " + testedDecompressedEncoding, function () {
                     var source;
                     if (testedSourceEncoding == "String")
                         source = sourceAsString;
@@ -2379,4 +2382,40 @@ var LZUTF8;
 /// <reference path="./Benchmarks/Common/Benchmark.ts"/>
 /// <reference path="./Tests/TestSuites/CompressionTests.spec.ts"/>
 /// <reference path="./Tests/TestSuites/EncodingTests.spec.ts"/>
+/// <reference path="./LZUTF8/Library/Dependencies/node-internal.d.ts"/>
+/// <reference path="./LZUTF8/Tests/Dependencies/jasmine.d.ts"/>
+/// <reference path="./LZUTF8/Library/Common/Globals.ext.ts"/>
+/// <reference path="./LZUTF8/Library/Compression/Compressor.ts"/>
+/// <reference path="./LZUTF8/CLI/CLI.ts"/>
+/// <reference path="./LZUTF8/Library/Async/AsyncCompressor.ts"/>
+/// <reference path="./LZUTF8/Library/Async/AsyncDecompressor.ts"/>
+/// <reference path="./LZUTF8/Library/Async/WebWorker.ts"/>
+/// <reference path="./LZUTF8/Library/Common/ArraySegment.ts"/>
+/// <reference path="./LZUTF8/Library/Common/ArrayTools.ts"/>
+/// <reference path="./LZUTF8/Library/Common/ByteArray.ts"/>
+/// <reference path="./LZUTF8/Library/Common/CompressionCommon.ts"/>
+/// <reference path="./LZUTF8/Library/Common/EventLoop.ts"/>
+/// <reference path="./LZUTF8/Library/Common/GlobalInterfaces.ts"/>
+/// <reference path="./LZUTF8/Benchmarks/BenchmarkSuites/AsyncBenchmarks.ts"/>
+/// <reference path="./LZUTF8/Library/Common/ObjectTools.ts"/>
+/// <reference path="./LZUTF8/Library/Common/StringBuilder.ts"/>
+/// <reference path="./LZUTF8/Library/Common/Timer.ts"/>
+/// <reference path="./LZUTF8/Benchmarks/BenchmarkSuites/CompressionBenchmarks.ts"/>
+/// <reference path="./LZUTF8/Library/Compression/CompressorCustomHashTable.ts"/>
+/// <reference path="./LZUTF8/Library/Compression/CompressorSimpleHashTable.ts"/>
+/// <reference path="./LZUTF8/Library/Decompression/Decompressor.ts"/>
+/// <reference path="./LZUTF8/Benchmarks/BenchmarkSuites/EncodingBenchmarks.ts"/>
+/// <reference path="./LZUTF8/Library/Encoding/Base64.ts"/>
+/// <reference path="./LZUTF8/Library/Encoding/BinaryString.ts"/>
+/// <reference path="./LZUTF8/Library/Encoding/Misc.ts"/>
+/// <reference path="./LZUTF8/Library/Encoding/UTF8.ts"/>
+/// <reference path="./LZUTF8/Library/Exports/Exports.ts"/>
+/// <reference path="./LZUTF8/Tests/Common/JasmineFiller.ts"/>
+/// <reference path="./LZUTF8/Tests/Common/Random.ts"/>
+/// <reference path="./LZUTF8/Tests/Common/TestData.ts"/>
+/// <reference path="./LZUTF8/Tests/Common/TestingTools.ts"/>
+/// <reference path="./LZUTF8/Benchmarks/Common/Benchmark.ts"/>
+/// <reference path="./LZUTF8/_references.ts"/>
+/// <reference path="./LZUTF8/Tests/TestSuites/CompressionTests.spec.ts"/>
+/// <reference path="./LZUTF8/Tests/TestSuites/EncodingTests.spec.ts"/>
 //# sourceMappingURL=lzutf8.js.map
