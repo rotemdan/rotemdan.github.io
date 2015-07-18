@@ -1,0 +1,140 @@
+﻿@media screen {
+  body,
+  input,
+  select,
+  .ui-select,
+  button {
+    font-size: 2.5vw !important;
+  }
+}
+@media (max-width: 640px) {
+  body,
+  input,
+  select,
+  .ui-select,
+  button {
+    font-size: 16px !important;
+  }
+}
+@media (max-width: 400px) {
+  .labelColumn {
+    display: none;
+  }
+}
+/*
+@media (min-width: 1224px) and (orientation: landscape)
+{
+	#top, #container
+	{
+		margin-left: 20%;
+		margin-right: 20%;
+	}
+}
+*/
+body,
+input,
+select,
+.ui-select,
+button {
+  font-family: 'Segoe UI', Verdana, sans-serif;
+}
+#top,
+#container {
+  padding-left: 0.5em !important;
+  padding-right: 0.5em !important;
+  overflow: hidden;
+}
+#top {
+  background-color: #e4e4e4;
+  margin-bottom: 0.2em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#caption {
+  font-size: 1.5em;
+  font-weight: 800;
+}
+table {
+  width: 100% !important;
+  border-spacing: 0em 0.3em;
+  table-layout: fixed;
+  vertical-align: middle;
+}
+table td {
+  padding: 0;
+}
+input,
+.ui-input-text {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.ui-select {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.ui-select > div {
+  padding-top: 0.43em;
+  padding-bottom: 0.43em;
+}
+input[type="text"],
+input[type="number"] {
+  padding-left: 0.4em !important;
+}
+.ui-checkbox > label {
+  font-size: 0.8em !important;
+}
+.labelColumn {
+  width: 6em !important;
+  overflow: hidden !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.inputColumn {
+  width: 100% !important;
+  padding-right: 0.3em !important;
+}
+.unitSelectionColumn {
+  width: 10em !important;
+}
+.lockColumn {
+  width: 2.3em !important;
+  text-align: center;
+}
+input[type="checkbox"] {
+  visibility: hidden;
+}
+span.fa-lock {
+  color: black;
+  cursor: pointer;
+  font-size: 1.8em;
+  padding-top: 3px;
+  opacity: 0.3;
+}
+span.fa-lock[data-locked="true"] {
+  opacity: 1;
+}
+.ui-state-disabled,
+input[type="text"][readonly] {
+  opacity: 0.7 !important;
+}
+#onScreenKeypad {
+  display: none;
+  position: fixed;
+  right: 0%;
+  bottom: 0%;
+  width: 15em;
+  z-index: 100;
+}
+#onScreenKeypad > div {
+  overflow: visible;
+}
+#onScreenKeypad button {
+  opacity: 0.9;
+  margin: 0;
+}
+#onScreenKeypad > table {
+  border-spacing: 0.15em;
+}

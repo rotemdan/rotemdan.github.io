@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+	<title>Ohm's Law Calculator</title>
+	<link rel="stylesheet" href="User Interface/OhmsLawCalculatorUI-Mobile.css" type="text/css" />
+	<link rel="stylesheet" href="Dependencies/font-awesome/css/font-awesome.css" type="text/css" />
+
+	<link rel="shortcut icon" href="User Interface/Images/favicon.png" />
+	<script src="Dependencies/jquery.js"></script>
+
+	<link rel="stylesheet" href="Dependencies/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css">
+	<script src="Dependencies/jquery.mobile-1.4.5/jquery.mobile-1.4.5.js"></script>
+
+	<script src="Build/OhmsLawCalculator.js"></script>
+	<script src="User Interface/Starter.js"></script>
+</head>
+
+<body>
+	<div id="top">
+		<div id="caption">Ohm's law calculator</div>
+	</div>
+	<div id="container">
+		<div id="main">
+			<table id="mainTable">
+				<tr id="voltage">
+					<td class="labelColumn">Voltage:</td>
+					<td class="inputColumn"><input type="text" inputmode="numeric" /></td>
+					<td class="unitSelectionColumn"><select data-mini="true"><option value="0.001">millivolt</option><option value="1" selected>volt</option><option value="1000">kilovolt</option><option value="1000000">megavolt</option></select></td>
+					<td class="lockColumn"><span class="fa fa-lock" data-locked="false"></span></td>
+				</tr>
+				<tr id="current">
+					<td class="labelColumn">Current:</td>
+					<td class="inputColumn"><input type="text" inputmode="numeric" /></td>
+					<td class="unitSelectionColumn"><select data-mini="true"><option value="0.001">milliamp</option><option value="1" selected>amp</option><option value="1000">kiloamp</option><option value="1000000">megaamp</option></select></td>
+					<td class="lockColumn"><span class="fa fa-lock" data-locked="false"></span></td>
+				</tr>
+				<tr id="resistance">
+					<td class="labelColumn">Resistance:</td>
+					<td class="inputColumn"><input type="text" inputmode="numeric" /></td>
+					<td class="unitSelectionColumn"><select data-mini="true"><option value="0.001">milliohm</option><option value="1" selected>ohm</option><option value="1000">kiloohm</option><option value="1000000">megaohm</option></select></td>
+					<td class="lockColumn"><span class="fa fa-lock" data-locked="false"></span></td>
+				</tr>
+				<tr id="power">
+					<td class="labelColumn">Power:</td>
+					<td class="inputColumn"><input type="text" inputmode="numeric" /></td>
+					<td class="unitSelectionColumn"><select data-mini="true"><option value="0.001">milliwatt</option><option value="1" selected>watt</option><option value="1000">kilowatt</option><option value="1000000">megawatt</option></select></td>
+					<td class="lockColumn"><span class="fa fa-lock" data-locked="false"></span></td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="bottom">
+			<div><button id="resetButton">Clear</button></div>
+			<label id="autoAdjustCheckboxContainer">Auto-adjust units of computed values<input type="checkbox" id="autoAdjustCheckbox" title="Automatically set magnitude of resulting values" checked="checked" /></label>
+		</div>
+	</div>
+</body>
+</html>
