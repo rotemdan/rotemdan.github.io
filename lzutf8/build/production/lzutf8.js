@@ -1,12 +1,12 @@
 /*!
- LZ-UTF8 v0.4.0
+ LZ-UTF8 v0.5.7
 
- Copyright (c) 2017, Rotem Dan
+ Copyright (c) 2018, Rotem Dan
  Released under the MIT license.
 
- Build date: 2017-02-27 
+ Build date: 2021-01-12 
 
- Please report any issues at https://github.com/rotemdan/lzutf8.js/issues
+ Please report any issue at https://github.com/rotemdan/lzutf8.js/issues
 */
 var LZUTF8;
 (function (LZUTF8) {
@@ -26,7 +26,7 @@ var LZUTF8;
         return LZUTF8.runningInNodeJS() && typeof process.send === "function";
     };
     LZUTF8.runningInNullOrigin = function () {
-        if (typeof window !== "object" || typeof window.location !== "object")
+        if (typeof window !== "object" || typeof window.location !== "object" || typeof document !== "object")
             return false;
         return document.location.protocol !== 'http:' && document.location.protocol !== 'https:';
     };
@@ -38,9 +38,6 @@ var LZUTF8;
         if (navigator && navigator.userAgent && navigator.userAgent.indexOf("Android 4.3") >= 0)
             return false;
         return true;
-    };
-    LZUTF8.webSocketsAvailable = function () {
-        return (typeof WebSocket === "function");
     };
     LZUTF8.log = function (message, appendToDocument) {
         if (appendToDocument === void 0) { appendToDocument = false; }
@@ -92,6 +89,42 @@ var LZUTF8;
     if (LZUTF8.commonJSAvailable())
         module.exports = LZUTF8;
 })(LZUTF8 || (LZUTF8 = {}));
+var IE10SubarrayBugPatcher;
+(function (IE10SubarrayBugPatcher) {
+    if (typeof Uint8Array === "function" && new Uint8Array(1).subarray(1).byteLength !== 0) {
+        var subarray = function (start, end) {
+            var clamp = function (v, min, max) { return v < min ? min : v > max ? max : v; };
+            start = start | 0;
+            end = end | 0;
+            if (arguments.length < 1)
+                start = 0;
+            if (arguments.length < 2)
+                end = this.length;
+            if (start < 0)
+                start = this.length + start;
+            if (end < 0)
+                end = this.length + end;
+            start = clamp(start, 0, this.length);
+            end = clamp(end, 0, this.length);
+            var len = end - start;
+            if (len < 0)
+                len = 0;
+            return new this.constructor(this.buffer, this.byteOffset + start * this.BYTES_PER_ELEMENT, len);
+        };
+        var types = ['Int8Array', 'Uint8Array', 'Uint8ClampedArray', 'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array', 'Float32Array', 'Float64Array'];
+        var globalObject = void 0;
+        if (typeof window === "object")
+            globalObject = window;
+        else if (typeof self === "object")
+            globalObject = self;
+        if (globalObject !== undefined) {
+            for (var i = 0; i < types.length; i++) {
+                if (globalObject[types[i]])
+                    globalObject[types[i]].prototype.subarray = subarray;
+            }
+        }
+    }
+})(IE10SubarrayBugPatcher || (IE10SubarrayBugPatcher = {}));
 var LZUTF8;
 (function (LZUTF8) {
     var AsyncCompressor = (function () {
@@ -149,7 +182,7 @@ var LZUTF8;
         };
         AsyncCompressor.createCompressionStream = function () {
             var compressor = new LZUTF8.Compressor();
-            var NodeStream = require("stream");
+            var NodeStream = require("readable-stream");
             var compressionStream = new NodeStream.Transform({ decodeStrings: true, highWaterMark: 65536 });
             compressionStream._transform = function (data, encoding, done) {
                 var buffer;
@@ -226,7 +259,7 @@ var LZUTF8;
         };
         AsyncDecompressor.createDecompressionStream = function () {
             var decompressor = new LZUTF8.Decompressor();
-            var NodeStream = require("stream");
+            var NodeStream = require("readable-stream");
             var decompressionStream = new NodeStream.Transform({ decodeStrings: true, highWaterMark: 65536 });
             decompressionStream._transform = function (data, encoding, done) {
                 var buffer;
@@ -317,7 +350,7 @@ var LZUTF8;
                             data: compressedData,
                             encoding: request.outputEncoding,
                         };
-                        if (response.data instanceof Uint8Array)
+                        if (response.data instanceof Uint8Array && navigator.appVersion.indexOf("MSIE 10") === -1)
                             self.postMessage(response, [response.data.buffer]);
                         else
                             self.postMessage(response, []);
@@ -337,7 +370,7 @@ var LZUTF8;
                             data: decompressedData,
                             encoding: request.outputEncoding,
                         };
-                        if (response.data instanceof Uint8Array)
+                        if (response.data instanceof Uint8Array && navigator.appVersion.indexOf("MSIE 10") === -1)
                             self.postMessage(response, [response.data.buffer]);
                         else
                             self.postMessage(response, []);
@@ -525,6 +558,8 @@ var LZUTF8;
                     return LZUTF8.encodeBase64(compressedBytes);
                 case "BinaryString":
                     return LZUTF8.encodeBinaryString(compressedBytes);
+                case "StorageBinaryString":
+                    return LZUTF8.encodeStorageBinaryString(compressedBytes);
                 default:
                     throw new TypeError("encodeCompressedBytes: invalid output encoding requested");
             }
@@ -547,6 +582,10 @@ var LZUTF8;
                     if (typeof compressedData !== "string")
                         throw new TypeError("decodeCompressedData: 'BinaryString' input type was specified but input is not a string");
                     return LZUTF8.decodeBinaryString(compressedData);
+                case "StorageBinaryString":
+                    if (typeof compressedData !== "string")
+                        throw new TypeError("decodeCompressedData: 'StorageBinaryString' input type was specified but input is not a string");
+                    return LZUTF8.decodeStorageBinaryString(compressedData);
                 default:
                     throw new TypeError("decodeCompressedData: invalid input encoding requested: '" + inputEncoding + "'");
             }
@@ -1131,39 +1170,6 @@ var LZUTF8;
     }());
     LZUTF8.Decompressor = Decompressor;
 })(LZUTF8 || (LZUTF8 = {}));
-if (typeof Uint8Array === "function" && new Uint8Array(1).subarray(1).byteLength !== 0) {
-    var subarray = function (start, end) {
-        var clamp = function (v, min, max) { return v < min ? min : v > max ? max : v; };
-        start = start | 0;
-        end = end | 0;
-        if (arguments.length < 1)
-            start = 0;
-        if (arguments.length < 2)
-            end = this.length;
-        if (start < 0)
-            start = this.length + start;
-        if (end < 0)
-            end = this.length + end;
-        start = clamp(start, 0, this.length);
-        end = clamp(end, 0, this.length);
-        var len = end - start;
-        if (len < 0)
-            len = 0;
-        return new this.constructor(this.buffer, this.byteOffset + start * this.BYTES_PER_ELEMENT, len);
-    };
-    var types = ['Int8Array', 'Uint8Array', 'Uint8ClampedArray', 'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array', 'Float32Array', 'Float64Array'];
-    var globalObject = void 0;
-    if (typeof window === "object")
-        globalObject = window;
-    else if (typeof self === "object")
-        globalObject = self;
-    if (globalObject !== undefined) {
-        for (var i = 0; i < types.length; i++) {
-            if (globalObject[types[i]])
-                globalObject[types[i]].prototype.subarray = subarray;
-        }
-    }
-}
 var LZUTF8;
 (function (LZUTF8) {
     var Encoding;
@@ -1380,6 +1386,21 @@ var LZUTF8;
                 return resultArray.join(" ");
             };
         })(DecimalString = Encoding.DecimalString || (Encoding.DecimalString = {}));
+    })(Encoding = LZUTF8.Encoding || (LZUTF8.Encoding = {}));
+})(LZUTF8 || (LZUTF8 = {}));
+var LZUTF8;
+(function (LZUTF8) {
+    var Encoding;
+    (function (Encoding) {
+        var StorageBinaryString;
+        (function (StorageBinaryString) {
+            StorageBinaryString.encode = function (input) {
+                return Encoding.BinaryString.encode(input).replace(/\0/g, '\u8002');
+            };
+            StorageBinaryString.decode = function (input) {
+                return Encoding.BinaryString.decode(input.replace(/\u8002/g, '\0'));
+            };
+        })(StorageBinaryString = Encoding.StorageBinaryString || (Encoding.StorageBinaryString = {}));
     })(Encoding = LZUTF8.Encoding || (LZUTF8.Encoding = {}));
 })(LZUTF8 || (LZUTF8 = {}));
 var LZUTF8;
@@ -1608,4 +1629,12 @@ var LZUTF8;
         return LZUTF8.Encoding.BinaryString.decode(str);
     }
     LZUTF8.decodeBinaryString = decodeBinaryString;
+    function encodeStorageBinaryString(input) {
+        return LZUTF8.Encoding.StorageBinaryString.encode(input);
+    }
+    LZUTF8.encodeStorageBinaryString = encodeStorageBinaryString;
+    function decodeStorageBinaryString(str) {
+        return LZUTF8.Encoding.StorageBinaryString.decode(str);
+    }
+    LZUTF8.decodeStorageBinaryString = decodeStorageBinaryString;
 })(LZUTF8 || (LZUTF8 = {}));
