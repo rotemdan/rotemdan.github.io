@@ -1,5 +1,5 @@
 body {
-	font-size: 1em;
+	font-size: 16px;
 	/*font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
 	font-family: Selawik, sans-serif;
 	max-width: 60em;
@@ -9,6 +9,7 @@ body {
 }
 
 h1.main-header {
+	margin-top: 0em;
 	text-align: center;
 }
 
@@ -42,6 +43,7 @@ nav.table-of-contents {
 	background-color: rgb(248, 248, 248);
 	padding: 0.5em;
 	border-radius: 0.5em;
+	line-height: 1.5em;
 }
 
 a {
@@ -54,7 +56,7 @@ a:hover {
 }
 
 pre, code {
-	font-size: 0.95em;
+	font-size: 0.9em;
 	font-family: 'Fira Code', monospace;
 	font-variant-ligatures: none;
 	tab-size: 4;
@@ -63,6 +65,7 @@ pre, code {
 }
 
 pre.shiki, nav.table-of-contents {
+	font-size: 1.0em;
 	white-space: pre-wrap;
 	padding: 1em;
 	border-radius: 0.5em;
