@@ -6,11 +6,13 @@ body {
 	margin-left: auto;
 	margin-right: auto;
 	padding: 2em;
+	line-height: 1.55em;
 }
 
 h1.main-header {
 	margin-top: 0em;
 	text-align: center;
+	line-height: 1.4em;
 }
 
 h1, h2 {
@@ -39,11 +41,11 @@ h1:hover .header-anchor, h2:hover .header-anchor, h3:hover .header-anchor, h4:ho
 li { margin-bottom: 0.1em; }
 
 nav.table-of-contents {
-	font-size: 1.1em;
+	font-size: 1.0em;
 	background-color: rgb(248, 248, 248);
 	padding: 0.5em;
 	border-radius: 0.5em;
-	line-height: 1.5em;
+	line-height: 1.6em;
 }
 
 a {
@@ -59,6 +61,7 @@ pre, code {
 	font-size: 0.9em;
 	font-family: 'Fira Code', monospace;
 	font-variant-ligatures: none;
+	line-height: 1.3em;
 	tab-size: 4;
 	-moz-tab-size: 4;
 	background-color: rgb(248, 248, 248) !important;
