@@ -968,7 +968,7 @@
 <p>Now let's try to define more precisely what exactly are the constraints on a named return variable:</p>
 <p>A <strong>named return variable</strong> is a special variable that:</p>
 <ul>
-<li><strong>Can</strong> be reassigned multiple times, including from conditionals and loop bodies.</li>
+<li><strong>Can</strong> be reassigned multiple times, including from within conditionals and loop bodies.</li>
 <li><strong>Can</strong> be passed to any method (including to an action or an object initializer).</li>
 <li><strong>Can only</strong> be read from within an expression that is <strong>assigned back to itself</strong>.</li>
 <li><strong>Cannot</strong> be accessed from within a nested function or action.</li>
@@ -1038,7 +1038,7 @@
 <span style="color: #5B5B5B">		</span><span style="color: #0057E6">return</span><span style="color: #5B5B5B"> [...left, ...right]</span></code></pre>
 <p>Here's a simple bounded sieve of Eratosthenes using a <code>for</code> loop and a list comprehension:</p>
 <pre class="shiki" style="background-color: #FCFCFC"><code><span style="color: #0057E6">stream</span><span style="color: #5B5B5B"> primesTo</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">max: </span><span style="color: #0057E6">integer</span><span style="color: #B338FF">)</span>
-<span style="color: #5B5B5B">	</span><span style="color: #0057E6">for</span><span style="color: #5B5B5B"> n </span><span style="color: #0057E6">in</span><span style="color: #5B5B5B"> </span><span style="color: #E65C00">2</span><span style="color: #5B5B5B">..max, nonprimes: List</span><span style="color: #000000">&lt;</span><span style="color: #0057E6">integer</span><span style="color: #000000">&gt;</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=</span><span style="color: #5B5B5B"> []</span>
+<span style="color: #5B5B5B">	</span><span style="color: #0057E6">for</span><span style="color: #5B5B5B"> n </span><span style="color: #0057E6">in</span><span style="color: #5B5B5B"> </span><span style="color: #E65C00">2</span><span style="color: #5B5B5B">..max, nonprimes: Set</span><span style="color: #000000">&lt;</span><span style="color: #0057E6">integer</span><span style="color: #000000">&gt;</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=</span><span style="color: #5B5B5B"> </span><span style="color: #B338FF">{}</span>
 <span style="color: #5B5B5B">		</span><span style="color: #0057E6">if</span><span style="color: #5B5B5B"> </span><span style="color: #000000">not</span><span style="color: #5B5B5B"> nonprimes.includes</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">n</span><span style="color: #B338FF">)</span>
 <span style="color: #5B5B5B">			</span><span style="color: #0057E6">yield</span><span style="color: #5B5B5B"> n</span>
 
@@ -1839,13 +1839,11 @@ _(Remember that when the initializer function is executed, fields can be written
 <p>More complex assertions can be included in a type by referencing a <strong>predicate function</strong>, which must accept a single argument and a return type of <code>boolean</code>. These kinds of types are called <strong>assertion types</strong>.</p>
 <p>Assertion types, for the most part, cannot be checked during compile-time and would require a run-time call each time a variable of the type is initialized. The predicate's parameter type (which can be any type, including a refinement type) would be used to determine the base underlying type used at compile-time:</p>
 <pre class="shiki" style="background-color: #FCFCFC"><code><span style="color: #0057E6">predicate</span><span style="color: #5B5B5B"> MultipleOf10</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">x: </span><span style="color: #0057E6">integer</span><span style="color: #B338FF">)</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=&gt;</span><span style="color: #5B5B5B"> x </span><span style="color: #000000">mod</span><span style="color: #5B5B5B"> </span><span style="color: #E65C00">10</span><span style="color: #5B5B5B"> </span><span style="color: #000000">==</span><span style="color: #5B5B5B"> </span><span style="color: #E65C00">0</span>
-<span style="color: #5B5B5B">	....</span>
 
 <span style="color: #0057E6">function</span><span style="color: #5B5B5B"> something</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">x: MultipleOf10</span><span style="color: #B338FF">)</span>
 <span style="color: #5B5B5B">	....</span></code></pre>
 <p>Like any other method, assertion types can accept type arguments:</p>
 <pre class="shiki" style="background-color: #FCFCFC"><code><span style="color: #0057E6">predicate</span><span style="color: #5B5B5B"> ShortList</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">T</span><span style="color: #000000">&gt;</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">list: List</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">T</span><span style="color: #000000">&gt;</span><span style="color: #B338FF">)</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=&gt;</span><span style="color: #5B5B5B"> list.Length </span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B"> </span><span style="color: #E65C00">100</span>
-<span style="color: #5B5B5B">	....</span>
 
 <span style="color: #0057E6">function</span><span style="color: #5B5B5B"> something</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">x: ShortList</span><span style="color: #000000">&lt;</span><span style="color: #0057E6">string</span><span style="color: #000000">&gt;</span><span style="color: #B338FF">)</span>
 <span style="color: #5B5B5B">	....</span></code></pre>
@@ -2239,6 +2237,7 @@ _(Remember that when the initializer function is executed, fields can be written
 <pre class="shiki" style="background-color: #FCFCFC"><code><span style="color: #0057E6">class</span><span style="color: #5B5B5B"> Person</span>
 <span style="color: #5B5B5B">	name: </span><span style="color: #0057E6">string</span>
 <span style="color: #5B5B5B">	data: </span><span style="color: #B338FF">(</span><span style="color: #0057E6">integer</span><span style="color: #5B5B5B">, </span><span style="color: #0057E6">boolean</span><span style="color: #5B5B5B">, id: </span><span style="color: #0057E6">string</span><span style="color: #B338FF">)</span>
+
 <span style="color: #5B5B5B">	</span><span style="color: #0057E6">action</span><span style="color: #5B5B5B"> processMe</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">someData: </span><span style="color: #0057E6">integer</span><span style="color: #5B5B5B">, moreData: </span><span style="color: #0057E6">string</span><span style="color: #B338FF">)</span><span style="color: #5B5B5B">: Set</span><span style="color: #000000">&lt;</span><span style="color: #0057E6">string</span><span style="color: #000000">&gt;</span>
 <span style="color: #5B5B5B">		....</span>
 
@@ -2647,6 +2646,7 @@ _(Remember that when the initializer function is executed, fields can be written
 </ul>
 <h1 id="patterns-and-parsers"><a class="header-anchor" href="#patterns-and-parsers">§</a>Patterns and parsers</h1>
 <h2 id="pattern-methods"><a class="header-anchor" href="#pattern-methods">§</a>Pattern methods</h2>
+<p>Pattern methods are methods that enable the description of patterns,</p>
 <pre class="shiki" style="background-color: #FCFCFC"><code><span style="color: #0057E6">pattern</span><span style="color: #5B5B5B"> Repeated</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">T, R</span><span style="color: #000000">&gt;</span>
 <span style="color: #5B5B5B">	</span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">P: Pattern</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">T, R</span><span style="color: #000000">&gt;</span><span style="color: #5B5B5B">, minTimes: </span><span style="color: #0057E6">integer</span><span style="color: #5B5B5B">, maxTimes: </span><span style="color: #0057E6">integer</span><span style="color: #5B5B5B">, condition: R </span><span style="color: #000000">=&gt;</span><span style="color: #5B5B5B"> </span><span style="color: #0057E6">boolean</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=</span><span style="color: #5B5B5B"> _ </span><span style="color: #000000">=&gt;</span><span style="color: #5B5B5B"> </span><span style="color: #0057E6">true</span><span style="color: #B338FF">)</span><span style="color: #5B5B5B"> </span><span style="color: #0057E6">of</span><span style="color: #5B5B5B"> </span><span style="color: #B338FF">(</span><span style="color: #5B5B5B">results: List</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">R</span><span style="color: #000000">&gt;</span><span style="color: #5B5B5B"> </span><span style="color: #000000">=</span><span style="color: #5B5B5B"> []</span><span style="color: #B338FF">)</span><span style="color: #5B5B5B"> </span><span style="color: #0057E6">in</span><span style="color: #5B5B5B"> Stream</span><span style="color: #000000">&lt;</span><span style="color: #5B5B5B">T</span><span style="color: #000000">&gt;</span>
 
